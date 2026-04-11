@@ -37,7 +37,7 @@ class User extends Database
     }
     public function canAccess(string $halaman): bool
     {
-        $allowed = ['dashboard', 'stok-obat', 'pos-obat', 'histori-transaksi'];
+        $allowed = ['dashboard', 'stok-obat', 'pos-obat', 'histori-transaksi', 'list-product'];
         return in_array($halaman, $allowed);
     }
 }
@@ -84,7 +84,7 @@ class SuperAdmin extends User
     }
     public function canAccess(string $halaman): bool
     {
-        $superOnly = ['dashboard', 'stok-obat', 'pos-obat', 'histori-transaksi', 'manajemen-user'];
+        $superOnly = ['dashboard', 'stok-obat', 'pos-obat', 'histori-transaksi', 'list-product', 'manajemen-user'];
         if (in_array($halaman, $superOnly))
             return true;
         return parent::canAccess($halaman);

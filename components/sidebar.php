@@ -7,7 +7,8 @@ if (isset($_POST['logout'])) {
 }
 $activePage = $activePage ?? '';
 ?>
-<aside class="border-b border-cyan-200 flex flex-col bg-cyan-50 p-4 lg:border-b-0 lg:border-r lg:p-6">
+<aside
+    class="border-b border-cyan-200 flex flex-col bg-cyan-50 p-4 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r lg:p-6">
     <div class="flex items-center justify-between lg:block">
         <div>
             <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-700">
@@ -38,11 +39,15 @@ $activePage = $activePage ?? '';
             class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'stok' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
             Stok Obat
         </a>
-        <?php if ($user instanceof SuperAdmin): ?>
-        <a href="../manajemen-user/"
-            class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'manajemen-user' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
-            Manajemen User
+        <a href="../list-product/"
+            class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'list-product' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
+            List Product
         </a>
+        <?php if ($user instanceof SuperAdmin): ?>
+            <a href="../manajemen-user/"
+                class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'manajemen-user' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
+                Manajemen User
+            </a>
         <?php endif; ?>
         <form method="post" class=" mt-auto">
             <button type="submit" name="logout" href="../login/"

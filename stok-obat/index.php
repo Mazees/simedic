@@ -151,21 +151,6 @@ $pageSubtitle = 'Kelola item obat, stok masuk/keluar, dan obat baru.';
                             </button>
                         </form>
                     </article>
-
-                    <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <h2 class="text-lg font-bold">Riwayat Penyesuaian</h2>
-                        <ul class="mt-4 max-h-72 space-y-2 overflow-auto pr-1 text-sm">
-                            <template x-for="log in history" :key="log.id">
-                                <li class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
-                                    <p class="font-medium" x-text="log.text"></p>
-                                    <p class="text-xs text-slate-500" x-text="log.time"></p>
-                                </li>
-                            </template>
-                            <li x-show="history.length === 0" class="text-slate-500">
-                                Belum ada aktivitas stok.
-                            </li>
-                        </ul>
-                    </article>
                 </section>
             </div>
         </main>
