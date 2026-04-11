@@ -11,6 +11,7 @@ Aplikasi web manajemen apotek berbasis PHP native. Mencakup autentikasi berbasis
 | **Login** | Autentikasi username + password dengan `password_hash` | Semua |
 | **Dashboard** | Ringkasan omzet, transaksi, item kritis, dan grafik penjualan 7 hari | User, Super Admin |
 | **Kasir (POS)** | Pilih obat, keranjang belanja, hitung PPN 11%, checkout | User, Super Admin |
+| **Data Produk** | Tambah, edit, dan hapus master data obat/produk | User, Super Admin |
 | **Stok Obat** | Daftar stok, tambah/kurangi unit, tambah obat baru, riwayat penyesuaian | User, Super Admin |
 | **Histori Transaksi** | Rekap transaksi yang telah selesai | User, Super Admin |
 | **Manajemen User** | Tambah user, hapus user, promote/demote ke Super Admin | **Super Admin only** |
@@ -36,6 +37,7 @@ simedic/
 ├── migration/        # Skema SQL untuk setup database awal
 ├── login/            # Halaman autentikasi
 ├── dashboard/        # Halaman ringkasan operasional
+├── list-product/     # Manajemen data produk (tambah, edit, hapus)
 ├── stok-obat/        # Manajemen stok dan inventaris obat
 ├── pos-obat/         # Kasir / Point of Sale
 ├── histori-transaksi/# Rekap transaksi yang telah selesai
@@ -159,6 +161,7 @@ Database
 |---|:---:|:---:|
 | Dashboard | ✅ | ✅ |
 | Kasir (POS) | ✅ | ✅ |
+| Data Produk | ✅ | ✅ |
 | Stok Obat | ✅ | ✅ |
 | Histori Transaksi | ✅ | ✅ |
 | Manajemen User | ❌ | ✅ |
