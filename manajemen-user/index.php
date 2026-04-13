@@ -11,8 +11,8 @@ if (!$user->canAccess('manajemen-user')) {
 }
 
 if (isset($_POST['action'])) {
-    $action = $_POST['action'] ?? '';
-    $id = intval($_POST['id'] ?? 0);
+    $action = trim((string) ($_POST['action'] ?? ''));
+    $id = (int) ($_POST['id'] ?? 0);
     if ($action === 'add') {
         $username = trim($_POST['username'] ?? '');
         $password = trim($_POST['password'] ?? '');

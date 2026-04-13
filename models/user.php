@@ -7,6 +7,8 @@ class User extends Database
 {
     public function login($username, $password)
     {
+        $username = trim((string) $username);
+        $password = trim((string) $password);
         $stmt = $this->connection->prepare('SELECT * FROM users WHERE username = ? LIMIT 1');
         $stmt->bind_param("s", $username);
         $stmt->execute();
@@ -53,33 +55,41 @@ class SuperAdmin extends User
     }
     public function addUser($username, $password)
     {
+        $username = trim((string) $username);
+        $password = trim((string) $password);
         $pass = password_hash($password, PASSWORD_DEFAULT);
-        $this->connection->query("
+        $this->runQuery("
             INSERT INTO users(username, password, is_super_admin)
             VALUES ('$username', '$pass', 0);
-        ");
+        ", "Username sudah digunakan");
     }
     public function deleteUser($id)
     {
-        $this->connection->query("
+        $id = (int) $id;
+        $this->runQuery("
             DELETE FROM users WHERE id = $id;
-        ");
+        ", "Gagal menghapus user");
     }
     public function changeUserToSuperAdmin($id)
     {
-        $this->connection->query("
+        $id = (int) $id;
+        $this->runQuery("
             UPDATE users SET is_super_admin = 1 WHERE id = $id;
-        ");
+        ", "Gagal mengubah role user");
     }
     public function changeUserToUser($id)
     {
-        $this->connection->query("
+        $id = (int) $id;
+        $this->runQuery("
             UPDATE users SET is_super_admin = 0 WHERE id = $id;
-        ");
+        ", "Gagal mengubah role user");
     }
     public function getAllUsers(): array
     {
-        $result = $this->connection->query("SELECT id, username, is_super_admin FROM users ORDER BY id ASC");
+        $result = $this->runQuery("SELECT id, username, is_super_admin FROM users ORDER BY id ASC", "Gagal mengambil data user");
+        if (!$result) {
+            return [];
+        }
         return $result->fetch_all(MYSQLI_ASSOC);
     }
     public function canAccess(string $halaman): bool

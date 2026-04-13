@@ -14,11 +14,12 @@ create table product (
 create table stok (
  id INT primary key auto_increment,
  id_product INT,
- jumlah INT,
- tgl_masuk DATE,
+ batch VARCHAR(100) NOT NULL UNIQUE,
+ jumlah INT DEFAULT 0,
+ tgl_masuk DATE DEFAULT (CURRENT_DATE),
  tgl_exp DATE,
  foreign key (id_product) references product (id)
-)
+);
 
 create table transaksi (
 	id INT primary key auto_increment,

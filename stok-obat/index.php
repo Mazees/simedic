@@ -1,15 +1,76 @@
 <?php
 require_once __DIR__ . '/../models/user.php';
+require_once __DIR__ . '/../models/product.php';
+require_once __DIR__ . '/../models/stok.php';
+
 if (!$user->canAccess('stok-obat')) {
     header('Location: /simedic/error?code=403');
     exit;
 }
+
+$stokModel = new Stok();
+$productOptions = $product->getAllProduct();
+
+if (isset($_POST['add'])) {
+    $idProduct = (int) ($_POST['id_product'] ?? 0);
+    $kodeBatch = trim((string) ($_POST['batch'] ?? ''));
+    $jumlah = (int) ($_POST['jumlah'] ?? 0);
+    $tglExp = trim((string) ($_POST['tgl_exp'] ?? ''));
+
+    if ($idProduct > 0 && $kodeBatch !== '' && $jumlah >= 0 && $tglExp !== '') {
+        $stokModel->addStok($idProduct, $kodeBatch, $jumlah, $tglExp);
+    }
+
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+if (isset($_POST['increase'])) {
+    $id = (int) ($_POST['stok_id'] ?? 0);
+    if ($id > 0) {
+        $stokModel->increaseStok($id);
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+if (isset($_POST['decrease'])) {
+    $id = (int) ($_POST['stok_id'] ?? 0);
+    if ($id > 0) {
+        $stokModel->decreaseStok($id);
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+if (isset($_POST['delete'])) {
+    $id = (int) ($_POST['stok_id'] ?? 0);
+    if ($id > 0) {
+        $stokModel->deleteStok($id);
+    }
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+$listStok = $stokModel->getAllStok();
+$totalBatch = count($listStok);
+$lowStockCount = 0;
+$totalUnits = 0;
+
+foreach ($listStok as $stokItem) {
+    $jumlah = (int) $stokItem['jumlah'];
+    $totalUnits += $jumlah;
+    if ($jumlah <= 20) {
+        $lowStockCount++;
+    }
+}
+
 $activePage = 'stok';
 $pageTitle = 'Manajemen Stok Obat';
-$pageSubtitle = 'Kelola item obat, stok masuk/keluar, dan obat baru.';
+$pageSubtitle = 'Kelola item obat, stok masuk/keluar, dan batch obat.';
 ?>
 <!doctype html>
-<html lang="id" x-data="stockManagerPage()" class="h-full">
+<html lang="id" x-data="stokPage()" class="h-full">
 
 <head>
     <meta charset="UTF-8" />
@@ -53,201 +114,175 @@ $pageSubtitle = 'Kelola item obat, stok masuk/keluar, dan obat baru.';
                 <section class="lg:col-span-2 space-y-6">
                     <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                            <h2 class="text-lg font-bold">Daftar Stok Obat</h2>
-                            <input x-model="query" type="text" placeholder="Cari nama obat atau batch..."
+                            <h2 class="text-lg font-bold">Data Stok Obat</h2>
+                            <input x-model="query" type="text" placeholder="Cari nama obat atau kode batch..."
                                 class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600 sm:w-80" />
                         </div>
 
                         <div class="grid gap-4 sm:grid-cols-3">
                             <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                    Total Item
+                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Total Batch</p>
+                                <p class="mt-1 text-2xl font-bold">
+                                    <?= $totalBatch ?>
                                 </p>
-                                <p class="mt-1 text-2xl font-bold" x-text="items.length"></p>
                             </div>
                             <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                    Stok Rendah
+                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Stok Rendah</p>
+                                <p class="mt-1 text-2xl font-bold text-cyan-700">
+                                    <?= $lowStockCount ?>
                                 </p>
-                                <p class="mt-1 text-2xl font-bold text-cyan-700" x-text="lowStockCount"></p>
                             </div>
                             <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                    Total Unit
+                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Total Unit</p>
+                                <p class="mt-1 text-2xl font-bold">
+                                    <?= $totalUnits ?>
                                 </p>
-                                <p class="mt-1 text-2xl font-bold" x-text="totalUnits"></p>
                             </div>
                         </div>
 
                         <div class="mt-5 overflow-x-auto">
-                            <table class="w-full min-w-[760px] text-left text-sm">
+                            <table class="w-full min-w-[900px] text-left text-sm">
                                 <thead class="text-xs uppercase tracking-[0.12em] text-slate-500">
                                     <tr>
-                                        <th class="pb-3">Nama Obat</th>
+                                        <th class="pb-3">Obat</th>
                                         <th class="pb-3">Batch</th>
                                         <th class="pb-3">Stok</th>
                                         <th class="pb-3">Harga</th>
-                                        <th class="pb-3">Aksi Stok</th>
+                                        <th class="pb-3">Tgl Masuk</th>
+                                        <th class="pb-3">Tgl Exp</th>
+                                        <th class="pb-3">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <template x-for="item in filteredItems" :key="item.id">
+                                    <?php foreach ($listStok as $stokItem): ?>
                                         <tr class="border-t border-slate-100">
-                                            <td class="py-3 font-semibold" x-text="item.name"></td>
-                                            <td class="py-3 text-slate-600" x-text="item.batch"></td>
-                                            <td class="py-3">
-                                                <span class="rounded-full px-3 py-1 text-xs font-semibold"
-                                                    :class="item.stock <= 20 ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-100 text-slate-700'"
-                                                    x-text="item.stock + ' box'"></span>
+                                            <td class="py-3 font-semibold">
+                                                <?= htmlspecialchars($stokItem['nama'], ENT_QUOTES, 'UTF-8') ?>
                                             </td>
-                                            <td class="py-3 text-slate-600" x-text="formatCurrency(item.price)"></td>
+                                            <td class="py-3 text-slate-600">
+                                                <?= htmlspecialchars($stokItem['batch'], ENT_QUOTES, 'UTF-8') ?>
+                                            </td>
+                                            <td class="py-3">
+                                                <span
+                                                    class="rounded-full px-3 py-1 text-xs font-semibold <?= ((int) $stokItem['jumlah'] <= 20) ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-100 text-slate-700' ?>">
+                                                    <?= (int) $stokItem['jumlah'] ?> pcs
+                                                </span>
+                                            </td>
+                                            <td class="py-3 text-slate-600">
+                                                Rp
+                                                <?= number_format((int) $stokItem['harga'], 0, ',', '.') ?>
+                                            </td>
+                                            <td class="py-3 text-slate-600">
+                                                <?= htmlspecialchars($stokItem['tgl_masuk'] ?? '-', ENT_QUOTES, 'UTF-8') ?>
+                                            </td>
+                                            <td class="py-3 text-slate-600">
+                                                <?= htmlspecialchars($stokItem['tgl_exp'] ?? '-', ENT_QUOTES, 'UTF-8') ?>
+                                            </td>
                                             <td class="py-3">
                                                 <div class="inline-flex items-center gap-2">
-                                                    <button
-                                                        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold hover:border-cyan-500"
-                                                        @click="adjustStock(item.id, -1)">
-                                                        Kurangi
-                                                    </button>
-                                                    <button
-                                                        class="rounded-lg border border-cyan-600 bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700"
-                                                        @click="adjustStock(item.id, 1)">
-                                                        Tambah
-                                                    </button>
+                                                    <form method="post">
+                                                        <input type="hidden" name="stok_id"
+                                                            value="<?= (int) $stokItem['id'] ?>" />
+                                                        <button type="submit" name="decrease"
+                                                            class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold hover:border-cyan-500">
+                                                            Kurangi
+                                                        </button>
+                                                    </form>
+                                                    <form method="post">
+                                                        <input type="hidden" name="stok_id"
+                                                            value="<?= (int) $stokItem['id'] ?>" />
+                                                        <button type="submit" name="increase"
+                                                            class="rounded-lg border border-cyan-600 bg-cyan-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-cyan-700">
+                                                            Tambah
+                                                        </button>
+                                                    </form>
+                                                    <form method="post" onsubmit="return confirm('Hapus batch ini?')">
+                                                        <input type="hidden" name="stok_id"
+                                                            value="<?= (int) $stokItem['id'] ?>" />
+                                                        <button type="submit" name="delete"
+                                                            class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100">
+                                                            Hapus
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>
-                                    </template>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
                     </article>
                 </section>
 
-                <section class="space-y-6">
-                    <article class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
-                        <h2 class="text-lg font-bold">Tambah Obat Baru</h2>
-                        <p class="mt-1 text-sm text-slate-500">
-                            Input data obat untuk dimasukkan ke stok.
-                        </p>
+                <article class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="text-lg font-bold">Tambah Batch Stok</h3>
+                        <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">Mode
+                            Tambah</span>
+                    </div>
+                    <p class="mt-1 text-sm text-slate-500">Pilih obat dari list product lalu input data batch.</p>
 
-                        <form class="mt-5 space-y-3" @submit.prevent="addMedicine()">
-                            <input x-model="newItem.name" type="text" placeholder="Nama obat"
+                    <form class="mt-4 space-y-3" method="post">
+                        <select x-model="addForm.id_product" name="id_product"
+                            class="w-full rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            required>
+                            <option value="">Pilih obat</option>
+                            <?php foreach ($productOptions as $productItem): ?>
+                                <option value="<?= (int) $productItem['id'] ?>">
+                                    <?= $productItem['nama'] ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <input x-model="addForm.batch" type="text" placeholder="Kode batch" name="batch"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            required />
+                        <input x-model.number="addForm.jumlah" type="number" min="0" placeholder="Stok awal"
+                            name="jumlah"
+                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            required />
+                        <div class="flex flex-col">
+                            <label for="tgl_exp" class="text-sm text-slate-500">Tanggal Expired:</label>
+                            <input x-model="addForm.tgl_exp" type="date" id="tgl_exp" name="tgl_exp"
                                 class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
                                 required />
-                            <input x-model="newItem.batch" type="text" placeholder="Kode batch"
-                                class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
-                                required />
-                            <div class="grid grid-cols-2 gap-2">
-                                <input x-model.number="newItem.stock" type="number" min="0" placeholder="Stok awal"
-                                    class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
-                                    required />
-                                <input x-model.number="newItem.price" type="number" min="0" placeholder="Harga"
-                                    class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
-                                    required />
-                            </div>
-                            <button type="submit"
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" name="add"
                                 class="w-full rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
-                                Simpan Obat
+                                Simpan Batch
                             </button>
-                        </form>
-                    </article>
-                </section>
+                            <button type="button"
+                                class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+                                @click="resetAddForm()">
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </article>
             </div>
         </main>
     </div>
 
     <script>
-        function stockManagerPage() {
+        function stokPage() {
             return {
                 sidebarOpen: false,
                 query: "",
-                items: [
-                    {
-                        id: 1,
-                        name: "Paracetamol 500mg",
-                        batch: "PCT-11A",
-                        stock: 120,
-                        price: 12000,
-                    },
-                    {
-                        id: 2,
-                        name: "Amoxicillin 500mg",
-                        batch: "AMX-102",
-                        stock: 18,
-                        price: 24000,
-                    },
-                    {
-                        id: 3,
-                        name: "Cetirizine 10mg",
-                        batch: "CTZ-81B",
-                        stock: 30,
-                        price: 18000,
-                    },
-                    {
-                        id: 4,
-                        name: "Omeprazole 20mg",
-                        batch: "OMP-15D",
-                        stock: 22,
-                        price: 21000,
-                    },
-                ],
-                history: [],
-                newItem: {
-                    name: "",
+                addForm: {
+                    id_product: "",
                     batch: "",
-                    stock: 0,
-                    price: 0,
+                    jumlah: 0,
+                    tgl_masuk: "",
+                    tgl_exp: "",
                 },
-                get filteredItems() {
-                    return this.items.filter(
-                        (item) =>
-                            item.name.toLowerCase().includes(this.query.toLowerCase()) ||
-                            item.batch.toLowerCase().includes(this.query.toLowerCase())
-                    );
-                },
-                get lowStockCount() {
-                    return this.items.filter((item) => item.stock <= 20).length;
-                },
-                get totalUnits() {
-                    return this.items.reduce((sum, item) => sum + item.stock, 0);
-                },
-                adjustStock(id, delta) {
-                    const item = this.items.find((row) => row.id === id);
-                    if (!item) return;
-                    if (delta < 0 && item.stock === 0) return;
-                    item.stock += delta;
-                    this.history.unshift({
-                        id: Date.now() + Math.random(),
-                        text: `${delta > 0 ? "Tambah" : "Kurangi"} stok ${item.name} (${delta > 0 ? "+1" : "-1"})`,
-                        time: new Date().toLocaleString("id-ID"),
-                    });
-                    if (this.history.length > 20) this.history.pop();
-                },
-                addMedicine() {
-                    const name = this.newItem.name.trim();
-                    const batch = this.newItem.batch.trim();
-                    if (!name || !batch) return;
-                    const item = {
-                        id: Date.now(),
-                        name,
-                        batch,
-                        stock: Number(this.newItem.stock) || 0,
-                        price: Number(this.newItem.price) || 0,
+                resetAddForm() {
+                    this.addForm = {
+                        id_product: "",
+                        batch: "",
+                        jumlah: 0,
+                        tgl_masuk: "",
+                        tgl_exp: "",
                     };
-                    this.items.unshift(item);
-                    this.history.unshift({
-                        id: Date.now() + Math.random(),
-                        text: `Tambah obat baru ${item.name} (stok awal ${item.stock} box)`,
-                        time: new Date().toLocaleString("id-ID"),
-                    });
-                    this.newItem = { name: "", batch: "", stock: 0, price: 0 };
-                },
-                formatCurrency(value) {
-                    return new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        maximumFractionDigits: 0,
-                    }).format(value);
                 },
             };
         }

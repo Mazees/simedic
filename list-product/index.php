@@ -11,27 +11,38 @@ $pageSubtitle = 'Tambah, edit, dan hapus data produk dalam satu halaman (fronten
 $totalProduct = $product->getJumlahProduct();
 $rataRataHarga = $product->getRataRataHargaProduct();
 $listProduct = $product->getAllProduct();
+$searchQuery = '';
 
 if (isset($_POST['add'])) {
-    $nama = $_POST['nama'];
-    $harga = $_POST['harga'];
-    $product->addProduct($nama, $harga);
+    $nama = trim((string) ($_POST['nama'] ?? ''));
+    $harga = (int) ($_POST['harga'] ?? 0);
+    if ($nama !== '' && $harga >= 0) {
+        $product->addProduct($nama, $harga);
+    }
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 if (isset($_POST['edit'])) {
-    $id = $_POST['product_id'];
-    $nama = $_POST['nama'];
-    $harga = $_POST['harga'];
-    $product->updateProduct($nama, $harga, $id);
+    $id = (int) ($_POST['product_id'] ?? 0);
+    $nama = trim((string) ($_POST['nama'] ?? ''));
+    $harga = (int) ($_POST['harga'] ?? 0);
+    if ($id > 0 && $nama !== '' && $harga >= 0) {
+        $product->updateProduct($nama, $harga, $id);
+    }
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
 if (isset($_POST['delete'])) {
-    $id = $_POST['id'];
-    $product->deleteProduct($id);
+    $id = (int) ($_POST['id'] ?? 0);
+    if ($id > 0) {
+        $product->deleteProduct($id);
+    }
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
+}
+if (isset($_GET['search'])) {
+    $searchQuery = trim((string) ($_GET['search'] ?? ''));
+    $listProduct = $product->searchProduct($searchQuery);
 }
 ?>
 <!doctype html>
@@ -79,10 +90,16 @@ if (isset($_POST['delete'])) {
                     <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <h3 class="text-lg font-bold">Data Product</h3>
-                            <div class="w-full sm:w-auto">
-                                <input x-model="query" type="text" placeholder="Cari nama product..."
+                            <form method="get" class="w-full flex gap-2 sm:w-auto">
+                                <input type="text" value="<?= $_GET['search'] ?? '' ?>"
+                                    placeholder="Cari nama product..." name="search"
                                     class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600 sm:w-72" />
-                            </div>
+
+                                <button type="submit"
+                                    class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
+                                    Cari
+                                </button>
+                            </form>
                         </div>
 
                         <div class="mt-4 grid gap-4 sm:grid-cols-3">
@@ -112,7 +129,7 @@ if (isset($_POST['delete'])) {
                                             <td class="py-3 text-slate-500">#OB<?= $product['id'] ?></td>
                                             <td class="py-3 font-semibold"><?= $product['nama'] ?></td>
                                             <td class="py-3 text-slate-600">
-                                                <?= $product['harga'] ?>
+                                                Rp <?= $product['harga'] ?>
                                             </td>
                                             <td class="py-3 text-left">
                                                 <div class="inline-flex items-center gap-2">
@@ -241,13 +258,6 @@ if (isset($_POST['delete'])) {
                         price: 0,
 
                     };
-                },
-                formatCurrency(value) {
-                    return new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        maximumFractionDigits: 0,
-                    }).format(value);
                 },
             };
         }

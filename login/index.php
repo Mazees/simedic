@@ -8,8 +8,8 @@ $loginError = $_SESSION['login_error'] ?? null;
 unset($_SESSION['login_error']);
 
 if (isset($_POST['login'])) {
-    $userLogin = $_POST['username'];
-    $passLogin = $_POST['password'];
+    $userLogin = trim((string) ($_POST['username'] ?? ''));
+    $passLogin = trim((string) ($_POST['password'] ?? ''));
     $user->login($userLogin, $passLogin);
 }
 ?>

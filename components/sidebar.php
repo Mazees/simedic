@@ -41,7 +41,7 @@ $activePage = $activePage ?? '';
         </a>
         <a href="../list-product/"
             class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'list-product' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
-            List Product
+            List Obat
         </a>
         <?php if ($user instanceof SuperAdmin): ?>
             <a href="../manajemen-user/"
