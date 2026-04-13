@@ -66,13 +66,14 @@ CREATE TABLE product (
 );
 
 -- Stok per batch
-CREATE TABLE stok (
-    id          INT PRIMARY KEY AUTO_INCREMENT,
-    id_product  INT,
-    jumlah      INT,
-    tgl_masuk   DATE,
-    tgl_exp     DATE,
-    FOREIGN KEY (id_product) REFERENCES product(id)
+create table stok (
+ id INT primary key auto_increment,
+ id_product INT,
+ batch VARCHAR(100) NOT NULL UNIQUE,
+ jumlah INT DEFAULT 0,
+ tgl_masuk DATE DEFAULT (CURRENT_DATE),
+ tgl_exp DATE,
+ foreign key (id_product) references product (id)
 );
 
 -- Header transaksi
