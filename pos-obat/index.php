@@ -1,5 +1,11 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../models/user.php';
+require_once __DIR__ . '/../models/product.php';
+require_once __DIR__ . '/../models/transaction.php';
+
 if (!$user->canAccess('pos-obat')) {
     header('Location: /simedic/error?code=403');
     exit;
@@ -7,9 +13,30 @@ if (!$user->canAccess('pos-obat')) {
 $activePage = 'pos';
 $pageTitle = 'POS Obat';
 $pageSubtitle = 'Input transaksi penjualan obat dengan cepat.';
+
+$items = $product->getProductWithStock();
+$carts = $trs->getCarts();
+
+if (isset($_POST['add-cart'])) {
+    $id = (int) ($_POST['id'] ?? 0);
+    $nama = trim((string) ($_POST['nama'] ?? ''));
+    $harga = (int) ($_POST['harga'] ?? 0);
+    $trs->addCart($id, $nama, $harga);
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+if (isset($_POST['reduce-cart'])) {
+    $id = (int) ($_POST['id'] ?? 0);
+    $nama = trim((string) ($_POST['nama'] ?? ''));
+    $harga = (int) ($_POST['harga'] ?? 0);
+    $trs->reduceCart($id, $nama, $harga);
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
 ?>
 <!doctype html>
-<html lang="id" x-data="posPage()" class="h-full">
+<html lang="id" class="h-full">
 
 <head>
     <meta charset="UTF-8" />
@@ -39,7 +66,6 @@ $pageSubtitle = 'Input transaksi penjualan obat dengan cepat.';
             },
         };
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="min-h-full bg-slate-50 font-sans text-slate-900">
@@ -53,147 +79,89 @@ $pageSubtitle = 'Input transaksi penjualan obat dengan cepat.';
                 <section class="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <h3 class="text-lg font-bold">Daftar Obat</h3>
-                        <input x-model="query" type="text" placeholder="Cari obat..."
+                        <input type="text" placeholder="Cari obat..."
                             class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600 sm:w-72" />
                     </div>
 
                     <div class="grid gap-3 sm:grid-cols-2">
-                        <template x-for="item in filteredMedicine" :key="item.id">
+                        <?php foreach ($items as $no => $item): ?>
                             <article
                                 class="rounded-xl border border-slate-200 p-4 transition hover:border-cyan-300 hover:shadow-sm">
-                                <p class="font-semibold" x-text="item.name"></p>
-                                <p class="mt-1 text-sm text-slate-500" x-text="'Stok: ' + item.stock + ' box'"></p>
+                                <p class="font-semibold"><?= $item['nama'] ?></p>
+                                <p class="mt-1 text-sm text-slate-500">Stok: <?= $item['total_stok'] ?></p>
                                 <div class="mt-3 flex items-center justify-between">
-                                    <p class="font-bold text-cyan-700" x-text="formatCurrency(item.price)"></p>
-                                    <button
-                                        class="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-cyan-700"
-                                        @click="addToCart(item)">
-                                        Tambah
-                                    </button>
+                                    <p class="font-bold text-cyan-700">Rp<?= $item['harga'] ?></p>
+                                    <form method="post">
+                                        <input type="hidden" name="id" value="<?= $item['id'] ?>">
+                                        <input type="hidden" name="nama" value="<?= $item['nama'] ?>">
+                                        <input type="hidden" name="harga" value="<?= $item['harga'] ?>">
+                                        <button type="submit" name="add-cart"
+                                            class="rounded-lg bg-cyan-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-cyan-700">
+                                            Tambah
+                                        </button>
+                                    </form>
                                 </div>
                             </article>
-                        </template>
+                        <?php endforeach; ?>
                     </div>
                 </section>
 
                 <section class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
                     <h3 class="text-lg font-bold">Keranjang</h3>
-                    <div class="mt-4 space-y-3" x-show="cart.length > 0">
-                        <template x-for="item in cart" :key="item.id">
+                    <div class="mt-4 space-y-3">
+                        <?php foreach ($carts as $no => $cart): ?>
                             <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-3">
-                                <p class="font-medium" x-text="item.name"></p>
+                                <p class="font-medium"><?= $cart['nama'] ?></p>
                                 <div class="mt-2 flex items-center justify-between text-sm">
                                     <div class="inline-flex items-center gap-2">
-                                        <button class="rounded border border-cyan-200 bg-white px-2"
-                                            @click="decreaseQty(item.id)">
-                                            -
-                                        </button>
-                                        <span x-text="item.qty"></span>
-                                        <button class="rounded border border-cyan-200 bg-white px-2"
-                                            @click="increaseQty(item.id)">
-                                            +
-                                        </button>
+                                        <form method="post">
+                                            <input type="hidden" name="id" value="<?= $cart['id'] ?>">
+                                            <input type="hidden" name="nama" value="<?= $cart['nama'] ?>">
+                                            <input type="hidden" name="harga"
+                                                value="<?= $cart['subtotal'] / $cart['jumlah'] ?>">
+                                            <button type="submit" name="reduce-cart"
+                                                class="rounded border border-cyan-200 bg-white px-2">-</button>
+                                        </form>
+                                        <span><?= $cart['jumlah'] ?></span>
+                                        <form method="post">
+                                            <input type="hidden" name="id" value="<?= $cart['id'] ?>">
+                                            <input type="hidden" name="nama" value="<?= $cart['nama'] ?>">
+                                            <input type="hidden" name="harga"
+                                                value="<?= $cart['subtotal'] / $cart['jumlah'] ?>">
+                                            <button type="submit" name="add-cart"
+                                                class="rounded border border-cyan-200 bg-white px-2">+</button>
+                                        </form>
                                     </div>
-                                    <p x-text="formatCurrency(item.qty * item.price)"></p>
+                                    <p>Rp<?= $cart['subtotal'] ?></p>
                                 </div>
                             </div>
-                        </template>
+                        <?php endforeach; ?>
                     </div>
-                    <p x-show="cart.length === 0" class="mt-4 text-sm text-slate-500">
-                        Belum ada item dipilih.
-                    </p>
+                    <?php
+                        if(count($carts) <= 0){
+                            echo '<p class="mt-4 text-sm text-slate-500">Belum ada item dipilih.</p>';
+                        }
+                    ?>
 
                     <div class="mt-6 space-y-2 border-t border-slate-200 pt-4 text-sm">
                         <div class="flex justify-between">
                             <span>Subtotal</span>
-                            <span x-text="formatCurrency(subtotal)"></span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span>PPN 11%</span>
-                            <span x-text="formatCurrency(tax)"></span>
+                            <span>Rp45.000</span>
                         </div>
                         <div class="flex justify-between text-base font-bold">
                             <span>Total</span>
-                            <span x-text="formatCurrency(total)"></span>
+                            <span>Rp49.950</span>
                         </div>
                     </div>
 
                     <button
-                        class="mt-5 w-full rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700"
-                        @click="checkout()">
+                        class="mt-5 w-full rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700">
                         Bayar
                     </button>
                 </section>
             </div>
         </main>
     </div>
-
-    <script>
-        function posPage() {
-            return {
-                sidebarOpen: false,
-                query: "",
-                medicine: [
-                    { id: 1, name: "Paracetamol 500mg", price: 12000, stock: 120 },
-                    { id: 2, name: "Amoxicillin 500mg", price: 24000, stock: 42 },
-                    { id: 3, name: "Cetirizine 10mg", price: 18000, stock: 60 },
-                    { id: 4, name: "Omeprazole 20mg", price: 21000, stock: 30 },
-                    { id: 5, name: "Aspirin 80mg", price: 15000, stock: 15 },
-                    { id: 6, name: "Vitamin C 1000mg", price: 27000, stock: 80 },
-                ],
-                cart: [],
-                get filteredMedicine() {
-                    return this.medicine.filter((item) =>
-                        item.name.toLowerCase().includes(this.query.toLowerCase())
-                    );
-                },
-                get subtotal() {
-                    return this.cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-                },
-                get tax() {
-                    return this.subtotal * 0.11;
-                },
-                get total() {
-                    return this.subtotal + this.tax;
-                },
-                addToCart(item) {
-                    const found = this.cart.find((cartItem) => cartItem.id === item.id);
-                    if (found) {
-                        found.qty += 1;
-                    } else {
-                        this.cart.push({ ...item, qty: 1 });
-                    }
-                },
-                increaseQty(id) {
-                    const found = this.cart.find((item) => item.id === id);
-                    if (found) found.qty += 1;
-                },
-                decreaseQty(id) {
-                    const found = this.cart.find((item) => item.id === id);
-                    if (!found) return;
-                    found.qty -= 1;
-                    if (found.qty <= 0) {
-                        this.cart = this.cart.filter((item) => item.id !== id);
-                    }
-                },
-                checkout() {
-                    if (!this.cart.length) {
-                        alert("Keranjang masih kosong.");
-                        return;
-                    }
-                    alert("Pembayaran berhasil diproses.");
-                    this.cart = [];
-                },
-                formatCurrency(value) {
-                    return new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        maximumFractionDigits: 0,
-                    }).format(value);
-                },
-            };
-        }
-    </script>
 </body>
 
 </html>

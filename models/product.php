@@ -14,11 +14,11 @@ class Product extends Database
     public function getProductWithStock()
     {
         $data = $this->runQuery("
-            SELECT product.id, product.nama, SUM(stok.jumlah) AS total_stok
+            SELECT product.id, product.nama, product.harga, SUM(stok.jumlah) AS total_stok
             FROM stok
             JOIN product ON product.id = stok.id_product
-            GROUP BY product.id
-        ");
+            GROUP BY product.id, product.nama
+        ", "Gagal mengambil data produk dengan stok");
         if (!$data) {
             return [];
         }
