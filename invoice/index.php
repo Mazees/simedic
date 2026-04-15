@@ -74,7 +74,6 @@ if ($idTransaksi > 0) {
             <div class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
                 <p><span class="text-slate-500">ID Transaksi:</span> #TRX-<?= $idTransaksi > 0 ? $idTransaksi : '-' ?>
                 </p>
-                <p><span class="text-slate-500">Sumber Data:</span> detail_transaksi</p>
             </div>
 
             <div class="mt-6 overflow-x-auto">
