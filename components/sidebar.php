@@ -8,50 +8,61 @@ if (isset($_POST['logout'])) {
 $activePage = $activePage ?? '';
 ?>
 <aside
-    class="border-b-2 border-slate-900 flex flex-col bg-slate-900 p-4 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r-4 lg:border-cyan-500 lg:p-6">
+    class="flex flex-col bg-white border-b border-slate-200 p-4 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:border-b-0 lg:border-r lg:border-slate-200 lg:p-5">
     <div class="flex items-center justify-between lg:block">
-        <div>
-            <p class="text-xs font-bold uppercase tracking-[0.3em] text-cyan-400">
-                SIMEDIC
-            </p>
-            <h1 class="mt-1 text-xl font-bold text-white">Sistem Apotek</h1>
+        <div class="flex items-center gap-3">
+            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-cyan-600 p-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" class="h-full w-full">
+                    <rect width="32" height="32" rx="7" fill="#0891b2"/>
+                    <g transform="translate(16,16) rotate(-45) translate(-16,-16)">
+                        <rect x="11" y="6" width="10" height="10" rx="5" fill="white"/>
+                        <rect x="11" y="11" width="10" height="5" fill="white"/>
+                        <rect x="11" y="16" width="10" height="5" fill="rgba(255,255,255,0.5)"/>
+                        <rect x="11" y="16" width="10" height="10" rx="5" fill="rgba(255,255,255,0.5)"/>
+                    </g>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-base font-bold text-slate-800">SIMEDIC</h1>
+                <p class="text-xs text-slate-400">Sistem Apotek</p>
+            </div>
         </div>
-        <button class="border-2 border-cyan-500 bg-slate-800 px-3 py-2 text-sm font-semibold text-white lg:hidden"
+        <button class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-600 lg:hidden hover:bg-slate-50"
             @click="sidebarOpen = !sidebarOpen">
             Menu
         </button>
     </div>
 
-    <nav class="mt-4 h-full flex flex-col gap-1" :class="sidebarOpen ? 'flex' : 'hidden lg:flex'">
+    <nav class="mt-6 h-full flex flex-col gap-1" :class="sidebarOpen ? 'flex' : 'hidden lg:flex'">
         <a href="../dashboard/"
-            class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'dashboard' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+            class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'dashboard' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
             Dashboard
         </a>
         <a href="../pos-obat/"
-            class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'pos' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+            class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'pos' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
             Transaksi
         </a>
         <a href="../histori-transaksi/"
-            class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'histori' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+            class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'histori' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
             Histori Transaksi
         </a>
         <a href="../stok-obat/"
-            class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'stok' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+            class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'stok' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
             Stok Obat
         </a>
         <a href="../list-product/"
-            class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'list-product' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+            class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'list-product' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
             List Obat
         </a>
         <?php if ($user instanceof SuperAdmin): ?>
             <a href="../manajemen-user/"
-                class="w-full border-l-4 px-4 py-3 text-left text-sm font-semibold transition-colors <?php echo $activePage === 'manajemen-user' ? 'border-cyan-400 bg-cyan-500 text-white' : 'border-transparent text-slate-300 hover:border-slate-500 hover:bg-slate-800'; ?>">
+                class="w-full rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors <?php echo $activePage === 'manajemen-user' ? 'bg-cyan-50 text-cyan-700' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'; ?>">
                 Manajemen User
             </a>
         <?php endif; ?>
         <form method="post" class="mt-auto">
-            <button type="submit" name="logout" href="../login/"
-                class="w-full border-2 border-cyan-500 bg-cyan-600 px-4 py-3 text-left text-sm font-bold text-white hover:bg-cyan-700">
+            <button type="submit" name="logout"
+                class="w-full rounded-lg bg-slate-100 px-3 py-2.5 text-left text-sm font-medium text-slate-500 transition-colors hover:bg-red-50 hover:text-red-600">
                 Logout
             </button>
         </form>
