@@ -68,38 +68,103 @@ class Transaction extends Database
         return $total;
     }
 
-    public function pushTransaction()
+    public function checkStockAvailability($id_product, $requested_qty)
     {
-        $totalHarga = $this->getTotalHarga();
-        if ($totalHarga > 0) {
-            $insertTransaksi = $this->runQuery("
-            INSERT INTO transaksi (total_harga)
-            VALUES ($totalHarga)
-            ", "Gagal menambah stok");
+        $id_product = (int) $id_product;
+        $requested_qty = (int) $requested_qty;
+        $result = $this->runQuery("
+        SELECT SUM(jumlah) as total_stok 
+        FROM stok 
+        WHERE id_product = $id_product
+    ", "Gagal cek stok");
 
-            if ($insertTransaksi) {
-                $id = (int) $this->connection->insert_id;
-                $dataCarts = array_map(function ($cart) use ($id) {
-                    $nama = $this->connection->real_escape_string($cart['nama']);
-                    return "($id, {$cart['id']}, '$nama', {$cart['harga']}, {$cart['jumlah']})";
-                }, $_SESSION['carts']);
-
-                $value = implode(", ", $dataCarts);
-                $insertDetailTransaksi = $this->runQuery("
-                    INSERT INTO detail_transaksi(id_transaksi, id_product, nama_product, harga_product, qty) VALUES $value
-                " . "
-
-                ", "Gagal menambah stok");
-                if ($insertDetailTransaksi) {
-                    return $id;
-                }
-
-            } else {
-                return false;
-            }
-        } else {
+        if (!$result) {
             return false;
         }
+
+        $row = mysqli_fetch_assoc($result);
+        $totalStok = (int) ($row['total_stok'] ?? 0);
+        return ($totalStok >= $requested_qty);
+    }
+
+    public function pushTransaction()
+    {
+        if (count($_SESSION['carts']) <= 0) {
+            return "Keranjang masih kosong.";
+        }
+
+        foreach ($_SESSION['carts'] as $cart) {
+            if (!$this->checkStockAvailability($cart['id'], $cart['jumlah'])) {
+                // Jika ada satu saja barang yang stoknya kurang, batalkan semua
+                return "Stok untuk produk " . $cart['nama'] . " tidak mencukupi!";
+            }
+        }
+
+        // 2. Jika lolos validasi, baru jalankan insert transaksi dan update stok
+        $totalHarga = $this->getTotalHarga();
+        if ($totalHarga <= 0) {
+            return "Keranjang masih kosong.";
+        }
+
+        $this->connection->begin_transaction();
+
+        $insertTransaksi = $this->runQuery("
+            INSERT INTO transaksi (total_harga)
+            VALUES ($totalHarga)
+        ", "Gagal menambah transaksi");
+
+        if (!$insertTransaksi) {
+            $this->connection->rollback();
+            return "Gagal menambah transaksi.";
+        }
+
+        $id = (int) $this->connection->insert_id;
+        $dataCarts = array_map(function ($cart) use ($id) {
+            $nama = $this->connection->real_escape_string((string) ($cart['nama'] ?? ''));
+            $idProduct = (int) ($cart['id'] ?? 0);
+            $harga = (int) ($cart['harga'] ?? 0);
+            $jumlah = (int) ($cart['jumlah'] ?? 0);
+            return "($id, $idProduct, '$nama', $harga, $jumlah)";
+        }, $_SESSION['carts']);
+
+        if (count($dataCarts) <= 0) {
+            $this->connection->rollback();
+            return "Keranjang masih kosong.";
+        }
+
+        $value = implode(", ", $dataCarts);
+        $insertDetailTransaksi = $this->runQuery("
+            INSERT INTO detail_transaksi(id_transaksi, id_product, nama_product, harga_product, qty) VALUES $value
+        ", "Gagal menambah detail transaksi");
+
+        if (!$insertDetailTransaksi) {
+            $this->connection->rollback();
+            return "Gagal menambah detail transaksi.";
+        }
+
+        foreach ($_SESSION['carts'] as $cart) {
+            $idProduct = (int) ($cart['id'] ?? 0);
+            $qtyYangDibeli = (int) ($cart['jumlah'] ?? 0);
+
+            for ($i = 0; $i < $qtyYangDibeli; $i++) {
+                $update = $this->runQuery("
+                    UPDATE stok
+                    SET jumlah = jumlah - 1
+                    WHERE id_product = $idProduct
+                    AND jumlah > 0
+                    ORDER BY (tgl_exp IS NULL), tgl_exp ASC, tgl_masuk ASC, id ASC
+                    LIMIT 1
+                ", "Gagal mengurangi stok");
+
+                if (!$update || $this->connection->affected_rows <= 0) {
+                    $this->connection->rollback();
+                    return "Stok untuk produk " . ($cart['nama'] ?? 'ini') . " tidak mencukupi!";
+                }
+            }
+        }
+
+        $this->connection->commit();
+        return $id;
     }
 
     public function getTransactions()

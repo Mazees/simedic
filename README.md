@@ -6,15 +6,15 @@ Aplikasi web manajemen apotek berbasis PHP native. Mencakup autentikasi berbasis
 
 ## Fitur
 
-| Modul | Deskripsi | Akses |
-|---|---|---|
-| **Login** | Autentikasi username + password dengan `password_hash` | Semua |
-| **Dashboard** | Ringkasan omzet, transaksi, item kritis, dan grafik penjualan 7 hari | User, Super Admin |
-| **Kasir (POS)** | Pilih obat, keranjang belanja, hitung PPN 11%, checkout | User, Super Admin |
-| **Data Produk** | Tambah, edit, dan hapus master data obat/produk | User, Super Admin |
-| **Stok Obat** | Daftar stok, tambah/kurangi unit, tambah obat baru, riwayat penyesuaian | User, Super Admin |
-| **Histori Transaksi** | Rekap transaksi yang telah selesai | User, Super Admin |
-| **Manajemen User** | Tambah user, hapus user, promote/demote ke Super Admin | **Super Admin only** |
+| Modul                 | Deskripsi                                                               | Akses                                                           |
+| --------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Login**             | Autentikasi username + password dengan `password_hash`                  | Semua                                                           |
+| **Dashboard**         | Ringkasan omzet, transaksi, item kritis, dan grafik penjualan 7 hari    | User, Super Admin                                               |
+| **Kasir (POS)**       | Pilih obat, keranjang belanja, hitung PPN 11%, checkout                 | User, Super Admin                                               |
+| **Data Produk**       | Tambah, edit, dan hapus master data obat/produk                         | User, Super Admin                                               |
+| **Stok Obat**         | Daftar stok, tambah/kurangi unit, tambah obat baru, riwayat penyesuaian | User, Super Admin                                               |
+| **Histori Transaksi** | Rekap transaksi yang telah selesai                                      | User, Super Admin, Mengurangi stok obat dengan expired terdekat |
+| **Manajemen User**    | Tambah user, hapus user, promote/demote ke Super Admin                  | **Super Admin only**                                            |
 
 ---
 
@@ -103,6 +103,7 @@ CREATE TABLE detail_transaksi (
 ## Instalasi
 
 ### Prasyarat
+
 - [Laragon](https://laragon.org/) (atau XAMPP/WAMP)
 - PHP >= 8.0
 - MySQL >= 5.7
@@ -110,11 +111,13 @@ CREATE TABLE detail_transaksi (
 ### Langkah-langkah
 
 1. **Clone / salin project ke direktori web Laragon:**
+
    ```
    C:\laragon\www\simedic\
    ```
 
 2. **Buat database di MySQL:**
+
    ```sql
    CREATE DATABASE simedic;
    CREATE USER 'simedic'@'localhost' IDENTIFIED BY 'simedicdb26';
@@ -123,15 +126,18 @@ CREATE TABLE detail_transaksi (
 
 3. **Jalankan migration:**
    Buka file `migration/simedic-1.sql` dan jalankan di phpMyAdmin atau MySQL CLI:
+
    ```bash
    mysql -u simedic -p simedic < migration/simedic-1.sql
    ```
 
 4. **Seed akun Super Admin:**
    Buka `createadmin.php`, uncomment semua baris, lalu akses sekali via browser:
+
    ```
    http://localhost/simedic/createadmin.php
    ```
+
    > ⚠️ Setelah berhasil, comment kembali atau hapus isi file tersebut.
 
    Akun default yang di-seed:
@@ -160,16 +166,17 @@ Database
 
 ### Tabel Hak Akses
 
-| Halaman | User | Super Admin |
-|---|:---:|:---:|
-| Dashboard | ✅ | ✅ |
-| Kasir (POS) | ✅ | ✅ |
-| Data Produk | ✅ | ✅ |
-| Stok Obat | ✅ | ✅ |
-| Histori Transaksi | ✅ | ✅ |
-| Manajemen User | ❌ | ✅ |
+| Halaman           | User | Super Admin |
+| ----------------- | :--: | :---------: |
+| Dashboard         |  ✅  |     ✅      |
+| Kasir (POS)       |  ✅  |     ✅      |
+| Data Produk       |  ✅  |     ✅      |
+| Stok Obat         |  ✅  |     ✅      |
+| Histori Transaksi |  ✅  |     ✅      |
+| Manajemen User    |  ❌  |     ✅      |
 
 Seluruh halaman memvalidasi akses di baris pertama:
+
 ```php
 if (!$user->canAccess('nama-halaman')) {
     header('Location: /simedic/error?code=403');
@@ -182,12 +189,14 @@ if (!$user->canAccess('nama-halaman')) {
 ## Pola Kode
 
 ### PHP
+
 - Satu file `index.php` per halaman — handle POST di bagian atas, render HTML di bawah
 - Variabel `$user` diinisialisasi global di `models/user.php` (coba `SuperAdmin`, fallback ke `User`)
 - Redirect setelah POST (PRG pattern) untuk mencegah duplicate submit
 - Proteksi diri sendiri di manajemen user: `$u['id'] != $_SESSION['user_id']`
 
 ### HTML / Frontend
+
 - Layout sidebar + main dengan CSS Grid: `lg:grid-cols-[260px_1fr]`
 - State management ringan via Alpine.js (`x-data`, `x-model`, `x-for`, `@click`)
 - Tailwind CSS dikonfigurasi inline dengan color token `brand` (cyan-based)
@@ -214,10 +223,10 @@ private $db   = "simedic";
 
 Halaman `/simedic/error` menerima parameter `?code=` dan mendukung kode:
 
-| Kode | Pesan | Warna Aksen |
-|---|---|---|
-| 400 | Permintaan Tidak Valid | Ungu |
-| 401 | Akses Perlu Login | Kuning |
-| 403 | Akses Ditolak | Merah |
-| 404 | Halaman Tidak Ditemukan | Indigo |
-| 500 | Terjadi Kesalahan Server | Merah |
+| Kode | Pesan                    | Warna Aksen |
+| ---- | ------------------------ | ----------- |
+| 400  | Permintaan Tidak Valid   | Ungu        |
+| 401  | Akses Perlu Login        | Kuning      |
+| 403  | Akses Ditolak            | Merah       |
+| 404  | Halaman Tidak Ditemukan  | Indigo      |
+| 500  | Terjadi Kesalahan Server | Merah       |

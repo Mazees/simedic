@@ -16,7 +16,7 @@ $pageSubtitle = 'Input transaksi penjualan obat dengan cepat.';
 
 $items = $product->getProductWithStock();
 $carts = $trs->getCarts();
-$submitError = false;
+$submitError = '';
 
 if (isset($_POST['add-cart'])) {
     $id = (int) ($_POST['id'] ?? 0);
@@ -34,13 +34,13 @@ if (isset($_POST['reduce-cart'])) {
     exit();
 }
 if (isset($_POST['submit-transaksi'])) {
-    $insertId = $trs->pushTransaction();
-    if ($insertId !== false) {
+    $submitResult = $trs->pushTransaction();
+    if (is_int($submitResult) && $submitResult > 0) {
         $trs->clearCarts();
-        header('Location: ../invoice?id=' . $insertId);
+        header('Location: ../invoice?id=' . $submitResult);
         exit();
     }
-    $submitError = true;
+    $submitError = is_string($submitResult) ? $submitResult : 'Gagal memproses transaksi.';
 }
 
 ?>
@@ -106,9 +106,9 @@ if (isset($_POST['submit-transaksi'])) {
 
                 <section class="rounded-lg border border-slate-200 bg-white p-6">
                     <h3 class="text-base font-semibold text-slate-800">Keranjang</h3>
-                    <?php if ($submitError): ?>
+                    <?php if ($submitError !== ''): ?>
                         <p class="mt-2 rounded-lg bg-rose-50 border border-rose-200 px-3 py-2 text-sm text-rose-600">
-                            Keranjang masih kosong.
+                            <?= htmlspecialchars($submitError, ENT_QUOTES, 'UTF-8') ?>
                         </p>
                     <?php endif; ?>
                     <div class="mt-4 space-y-3">
