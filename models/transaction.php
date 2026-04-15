@@ -91,7 +91,7 @@ class Transaction extends Database
 
                 ", "Gagal menambah stok");
                 if ($insertDetailTransaksi) {
-                    return true;
+                    return $id;
                 }
 
             } else {

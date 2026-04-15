@@ -37,7 +37,7 @@ if (isset($_POST['submit-transaksi'])) {
     $insertId = $trs->pushTransaction();
     if ($insertId !== false) {
         $trs->clearCarts();
-        header('Location: ' . $_SERVER['PHP_SELF']);
+        header('Location: ../invoice?id=' . $insertId);
         exit();
     }
     $submitError = true;
@@ -54,8 +54,7 @@ if (isset($_POST['submit-transaksi'])) {
     <link rel="icon" type="image/svg+xml" href="/simedic/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -78,9 +77,8 @@ if (isset($_POST['submit-transaksi'])) {
             <div class="grid gap-6 lg:grid-cols-3">
                 <section class="lg:col-span-2 rounded-lg border border-slate-200 bg-white p-6">
                     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <h3 class="text-base font-semibold text-slate-800">Daftar Obat</h3>
-                        <input type="text" placeholder="Cari obat..."
-                            class="w-full rounded-lg border border-slate-300 px-4 py-2 text-sm outline-none transition focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 sm:w-72" />
+                        <h3 class="text-base font-semibold text-slate-800">Daftar Obat Yang Tersedia Saat Ini</h3>
+
                     </div>
 
                     <div class="grid gap-3 sm:grid-cols-2">

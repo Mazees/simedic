@@ -100,7 +100,7 @@ if (isset($_GET['search'])) {
                             </div>
                             <div class="rounded-lg bg-slate-800 p-4 text-white">
                                 <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Harga Rata-Rata</p>
-                                <p class="mt-1 text-2xl font-bold text-cyan-400"><?= $rataRataHarga ?></p>
+                                <p class="mt-1 text-2xl font-bold text-cyan-400">Rp <?= $rataRataHarga ?></p>
                             </div>
                         </div>
 
