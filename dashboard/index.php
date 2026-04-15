@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/user.php';
+require_once __DIR__ . '/../models/product.php';
+require_once __DIR__ . '/../models/transaction.php';
 if (!$user->canAccess('dashboard')) {
     header('Location: /simedic/error?code=403');
     exit;
@@ -7,9 +9,21 @@ if (!$user->canAccess('dashboard')) {
 $activePage = 'dashboard';
 $pageTitle = 'Dashboard';
 $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
+
+$todayStatistic = $trs->getTodayStatistic();
+$jumlahTransaksiHariIni = (int) ($todayStatistic['total'] ?? 0);
+$omzetHariIni = (int) ($todayStatistic['omzet'] ?? 0);
+$rataRataTransaksi = (int) ($todayStatistic['rata_rata'] ?? 0);
+
+$jumlahProduk = $product->getJumlahProduct();
+$rataRataHargaProduk = (int) $product->getRataRataHargaProduct();
+
+$produkDenganStok = $product->getProductWithStock();
+
+$history = $trs->getTransactions();
 ?>
 <!doctype html>
-<html lang="id" x-data="appPage()" class="h-full">
+<html lang="id" class="h-full">
 
 <head>
     <meta charset="UTF-8" />
@@ -39,7 +53,6 @@ $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
             },
         };
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="min-h-full bg-slate-100 font-sans text-slate-900">
@@ -51,98 +64,116 @@ $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
 
             <section class="space-y-6">
                 <div class="grid gap-0 sm:grid-cols-2 xl:grid-cols-4">
-                    <template x-for="(card, idx) in stats" :key="card.label">
-                        <article class="border-l-4 bg-white p-5"
-                            :class="idx % 2 === 0 ? 'border-cyan-500' : 'border-slate-900'">
-                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500" x-text="card.label"></p>
-                            <p class="mt-2 text-3xl font-bold" x-text="card.value"></p>
-                            <p class="mt-2 text-sm"
-                                :class="card.trend.startsWith('+') ? 'text-cyan-700' : 'text-slate-600'"
-                                x-text="card.trend"></p>
-                        </article>
-                    </template>
+                    <article class="border-l-4 border-cyan-500 bg-white p-5">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Omzet Hari Ini</p>
+                        <p class="mt-2 text-3xl font-bold">Rp <?= number_format($omzetHariIni, 0, ',', '.') ?></p>
+                        <p class="mt-2 text-sm text-cyan-700"><?= $jumlahTransaksiHariIni ?> transaksi hari ini</p>
+                    </article>
+                    <article class="border-l-4 border-slate-900 bg-white p-5">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Transaksi Hari Ini</p>
+                        <p class="mt-2 text-3xl font-bold"><?= $jumlahTransaksiHariIni ?></p>
+                        <p class="mt-2 text-sm text-slate-600">Rata-rata Rp
+                            <?= number_format($rataRataTransaksi, 0, ',', '.') ?></p>
+                    </article>
+                    <article class="border-l-4 border-cyan-500 bg-white p-5">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Total Produk</p>
+                        <p class="mt-2 text-3xl font-bold"><?= $jumlahProduk ?></p>
+                        <p class="mt-2 text-sm text-cyan-700">Harga rata-rata Rp
+                            <?= number_format($rataRataHargaProduk, 0, ',', '.') ?>
+                        </p>
+                    </article>
+                    <article class="border-l-4 border-slate-900 bg-white p-5">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Transaksi Tercatat</p>
+                        <p class="mt-2 text-3xl font-bold"><?= count($history) ?></p>
+                        <p class="mt-2 text-sm text-slate-600">Total riwayat transaksi</p>
+                    </article>
                 </div>
 
                 <div class="grid gap-6 xl:grid-cols-3">
-                    <article class="xl:col-span-2 bg-white p-6 border-t-4 border-cyan-500">
-                        <div class="mb-6 flex items-center justify-between">
-                            <h3 class="text-lg font-bold">Ringkasan Penjualan 7 Hari</h3>
-                            <span
-                                class="bg-cyan-600 px-3 py-1 text-xs font-bold text-white uppercase tracking-wider">Realtime</span>
+                    <article class="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h3 class="text-lg font-bold">Transaksi Terbaru</h3>
+                            <a href="/simedic/histori-transaksi"
+                                class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">Lihat semua</a>
                         </div>
-                        <div class="grid grid-cols-7 gap-3">
-                            <template x-for="day in sales" :key="day.name">
-                                <div class="space-y-2 text-center">
-                                    <div class="mx-auto flex h-36 w-8 items-end bg-slate-200">
-                                        <div class="w-full bg-cyan-600" :style="`height: ${day.amount}%;`">
-                                        </div>
-                                    </div>
-                                    <p class="text-xs font-bold text-slate-700" x-text="day.name"></p>
-                                </div>
-                            </template>
+                        <div class="overflow-x-auto">
+                            <table class="w-full min-w-[760px] text-left text-sm">
+                                <thead class="text-xs uppercase tracking-[0.12em] text-slate-500">
+                                    <tr>
+                                        <th class="pb-3">ID</th>
+                                        <th class="pb-3">Waktu</th>
+                                        <th class="pb-3">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach (array_slice($history, 0, 5) as $row): ?>
+                                        <tr class="border-t border-slate-100">
+                                            <td class="py-3 font-semibold">#TRX-<?= (int) ($row['id'] ?? 0) ?></td>
+                                            <td class="py-3 text-slate-600">
+                                                <?= htmlspecialchars((string) ($row['tgl_pembelian'] ?? '-'), ENT_QUOTES, 'UTF-8') ?>
+                                            </td>
+                                            <td class="py-3 text-slate-700">Rp
+                                                <?= number_format((int) ($row['total_harga'] ?? 0), 0, ',', '.') ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
                     </article>
 
-                    <article class="bg-slate-900 p-6 text-white">
-                        <h3 class="text-lg font-bold">Peringatan Cepat</h3>
-                        <div class="mt-4 space-y-3">
-                            <template x-for="alert in alerts" :key="alert.title">
-                                <div class="border-l-4 border-cyan-400 bg-slate-800 p-4">
-                                    <p class="font-semibold text-white" x-text="alert.title"></p>
-                                    <p class="mt-1 text-sm text-slate-400" x-text="alert.message"></p>
+                    <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h3 class="text-lg font-bold">Stok Produk</h3>
+                            <a href="/simedic/stok-obat"
+                                class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">Lihat stok</a>
+                        </div>
+                        <div class="space-y-3">
+                            <?php foreach (array_slice($produkDenganStok, 0, 4) as $item): ?>
+                                <div class="rounded-xl border border-slate-100 bg-slate-50 p-3">
+                                    <p class="font-semibold">
+                                        <?= htmlspecialchars((string) ($item['nama'] ?? '-'), ENT_QUOTES, 'UTF-8') ?></p>
+                                    <p class="mt-1 text-sm text-slate-600">Stok: <?= (int) ($item['total_stok'] ?? 0) ?></p>
                                 </div>
-                            </template>
+                            <?php endforeach; ?>
                         </div>
                     </article>
                 </div>
+
+                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h3 class="text-lg font-bold">Ringkasan Produk</h3>
+                        <a href="/simedic/list-product"
+                            class="text-sm font-semibold text-cyan-700 hover:text-cyan-800">Lihat produk</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[760px] text-left text-sm">
+                            <thead class="text-xs uppercase tracking-[0.12em] text-slate-500">
+                                <tr>
+                                    <th class="pb-3">ID</th>
+                                    <th class="pb-3">Nama</th>
+                                    <th class="pb-3">Harga</th>
+                                    <th class="pb-3">Stok</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach (array_slice($produkDenganStok, 0, 5) as $item): ?>
+                                    <tr class="border-t border-slate-100">
+                                        <td class="py-3 font-semibold">#<?= (int) ($item['id'] ?? 0) ?></td>
+                                        <td class="py-3 text-slate-600">
+                                            <?= htmlspecialchars((string) ($item['nama'] ?? '-'), ENT_QUOTES, 'UTF-8') ?>
+                                        </td>
+                                        <td class="py-3 text-slate-700">Rp
+                                            <?= number_format((int) ($item['harga'] ?? 0), 0, ',', '.') ?></td>
+                                        <td class="py-3 text-slate-700"><?= (int) ($item['total_stok'] ?? 0) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
             </section>
         </main>
     </div>
-
-    <script>
-        function appPage() {
-            return {
-                sidebarOpen: false,
-                stats: [
-                    {
-                        label: "Omzet Hari Ini",
-                        value: "Rp 8.450.000",
-                        trend: "+12.4% dari kemarin",
-                    },
-                    { label: "Transaksi", value: "128", trend: "+9 transaksi/jam" },
-                    {
-                        label: "Item Kritis",
-                        value: "17 Item",
-                        trend: "-3 item teratasi",
-                    },
-                    { label: "Retur Pending", value: "6", trend: "+1 hari ini" },
-                ],
-                sales: [
-                    { name: "Sen", amount: 45 },
-                    { name: "Sel", amount: 60 },
-                    { name: "Rab", amount: 53 },
-                    { name: "Kam", amount: 74 },
-                    { name: "Jum", amount: 92 },
-                    { name: "Sab", amount: 68 },
-                    { name: "Min", amount: 81 },
-                ],
-                alerts: [
-                    {
-                        title: "Aspirin 80mg",
-                        message: "Tersisa 5 strip. Rekomendasi restok hari ini.",
-                    },
-                    {
-                        title: "Antibiotik",
-                        message: "Perlu verifikasi resep untuk 3 transaksi terakhir.",
-                    },
-                    {
-                        title: "Supplier Sinar Farma",
-                        message: "Pengiriman tertunda 1 hari dari jadwal.",
-                    },
-                ],
-            };
-        }
-    </script>
 </body>
 
 </html>
