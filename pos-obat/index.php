@@ -16,6 +16,7 @@ $pageSubtitle = 'Input transaksi penjualan obat dengan cepat.';
 
 $items = $product->getProductWithStock();
 $carts = $trs->getCarts();
+$submitError = false;
 
 if (isset($_POST['add-cart'])) {
     $id = (int) ($_POST['id'] ?? 0);
@@ -27,11 +28,19 @@ if (isset($_POST['add-cart'])) {
 }
 if (isset($_POST['reduce-cart'])) {
     $id = (int) ($_POST['id'] ?? 0);
-    $nama = trim((string) ($_POST['nama'] ?? ''));
     $harga = (int) ($_POST['harga'] ?? 0);
-    $trs->reduceCart($id, $nama, $harga);
+    $trs->reduceCart($id, $harga);
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
+}
+if (isset($_POST['submit-transaksi'])) {
+    $insertId = $trs->pushTransaction();
+    if ($insertId !== false) {
+        $trs->clearCarts();
+        header('Location: ' . $_SERVER['PHP_SELF']);
+        exit();
+    }
+    $submitError = true;
 }
 
 ?>
@@ -108,6 +117,11 @@ if (isset($_POST['reduce-cart'])) {
 
                 <section class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
                     <h3 class="text-lg font-bold">Keranjang</h3>
+                    <?php if ($submitError): ?>
+                        <p class="mt-2 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+                            Keranjang masih kosong.
+                        </p>
+                    <?php endif; ?>
                     <div class="mt-4 space-y-3">
                         <?php foreach ($carts as $no => $cart): ?>
                             <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-3">
@@ -138,26 +152,24 @@ if (isset($_POST['reduce-cart'])) {
                         <?php endforeach; ?>
                     </div>
                     <?php
-                        if(count($carts) <= 0){
-                            echo '<p class="mt-4 text-sm text-slate-500">Belum ada item dipilih.</p>';
-                        }
+                    if (count($carts) <= 0) {
+                        echo '<p class="mt-4 text-sm text-slate-500">Belum ada item dipilih.</p>';
+                    }
                     ?>
 
                     <div class="mt-6 space-y-2 border-t border-slate-200 pt-4 text-sm">
-                        <div class="flex justify-between">
-                            <span>Subtotal</span>
-                            <span>Rp45.000</span>
-                        </div>
                         <div class="flex justify-between text-base font-bold">
                             <span>Total</span>
-                            <span>Rp49.950</span>
+                            <span>Rp <?= $trs->getTotalHarga() ?></span>
                         </div>
                     </div>
 
-                    <button
-                        class="mt-5 w-full rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700">
-                        Bayar
-                    </button>
+                    <form method="post">
+                        <button type="submit" name="submit-transaksi"
+                            class="mt-5 w-full rounded-xl bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700">
+                            Submit Transaksi
+                        </button>
+                    </form>
                 </section>
             </div>
         </main>

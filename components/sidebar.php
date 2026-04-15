@@ -29,7 +29,7 @@ $activePage = $activePage ?? '';
         </a>
         <a href="../pos-obat/"
             class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'pos' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
-            Kasir
+            Transaksi
         </a>
         <a href="../histori-transaksi/"
             class=" w-full rounded-xl border px-4 py-3 text-left text-sm font-semibold <?php echo $activePage === 'histori' ? 'border-cyan-600 bg-cyan-600 text-white' : 'border-slate-200 bg-white text-slate-700'; ?>">
