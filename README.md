@@ -120,8 +120,7 @@ CREATE TABLE detail_transaksi (
 
    ```sql
    CREATE DATABASE simedic;
-   CREATE USER 'simedic'@'localhost' IDENTIFIED BY 'simedicdb26';
-   GRANT ALL PRIVILEGES ON simedic.* TO 'simedic'@'localhost';
+   USE simedic;
    ```
 
 3. **Jalankan migration:**
@@ -210,9 +209,9 @@ Kredensial ada di `config.php`:
 
 ```php
 private $host = "localhost";
-private $user = "simedic";
-private $pass = "simedicdb26";
-private $db   = "simedic";
+private $user = "root";
+private $pass = "";
+private $db = "simedic";
 ```
 
 > Untuk production, pindahkan kredensial ke environment variable atau file `.env`.
