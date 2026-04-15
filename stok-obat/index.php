@@ -8,7 +8,6 @@ if (!$user->canAccess('stok-obat')) {
     exit;
 }
 
-$stokModel = new Stok();
 $productOptions = $product->getAllProduct();
 
 if (isset($_POST['add'])) {
@@ -18,7 +17,7 @@ if (isset($_POST['add'])) {
     $tglExp = trim((string) ($_POST['tgl_exp'] ?? ''));
 
     if ($idProduct > 0 && $kodeBatch !== '' && $jumlah >= 0 && $tglExp !== '') {
-        $stokModel->addStok($idProduct, $kodeBatch, $jumlah, $tglExp);
+        $stok->addStok($idProduct, $kodeBatch, $jumlah, $tglExp);
     }
 
     header('Location: ' . $_SERVER['PHP_SELF']);
@@ -28,7 +27,7 @@ if (isset($_POST['add'])) {
 if (isset($_POST['increase'])) {
     $id = (int) ($_POST['stok_id'] ?? 0);
     if ($id > 0) {
-        $stokModel->increaseStok($id);
+        $stok->increaseStok($id);
     }
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
@@ -37,7 +36,7 @@ if (isset($_POST['increase'])) {
 if (isset($_POST['decrease'])) {
     $id = (int) ($_POST['stok_id'] ?? 0);
     if ($id > 0) {
-        $stokModel->decreaseStok($id);
+        $stok->decreaseStok($id);
     }
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
@@ -46,13 +45,13 @@ if (isset($_POST['decrease'])) {
 if (isset($_POST['delete'])) {
     $id = (int) ($_POST['stok_id'] ?? 0);
     if ($id > 0) {
-        $stokModel->deleteStok($id);
+        $stok->deleteStok($id);
     }
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit();
 }
 
-$listStok = $stokModel->getAllStok();
+$listStok = $stok->getAllStok();
 $totalBatch = count($listStok);
 $lowStockCount = 0;
 $totalUnits = 0;
