@@ -48,7 +48,7 @@ $pageSubtitle = 'Pantau riwayat transaksi penjualan obat.';
     </script>
 </head>
 
-<body class="min-h-full bg-slate-50 font-sans text-slate-900">
+<body class="min-h-full bg-slate-100 font-sans text-slate-900">
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
 
@@ -56,47 +56,46 @@ $pageSubtitle = 'Pantau riwayat transaksi penjualan obat.';
             <?php include __DIR__ . '/../components/header.php'; ?>
 
             <section class="space-y-6">
-                <div class="grid gap-4 sm:grid-cols-3">
-                    <article class="rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
-                        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Total Transaksi Hari Ini</p>
-                        <p class="mt-2 text-2xl font-bold"><?= $jumlahTransaksiHariIni ?></p>
+                <div class="grid gap-0 sm:grid-cols-3">
+                    <article class="bg-cyan-600 p-5 text-white">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-100">Total Transaksi Hari Ini</p>
+                        <p class="mt-2 text-3xl font-bold"><?= $jumlahTransaksiHariIni ?></p>
                     </article>
-                    <article class="rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
-                        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Omzet Hari Ini</p>
-                        <p class="mt-2 text-2xl font-bold text-cyan-700">Rp <?= $omzet ?>
-                        </p>
+                    <article class="bg-slate-900 p-5 text-white">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Omzet Hari Ini</p>
+                        <p class="mt-2 text-3xl font-bold text-cyan-400">Rp <?= $omzet ?></p>
                     </article>
-                    <article class="rounded-2xl border border-cyan-100 bg-cyan-50 p-4">
-                        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Rata-rata per Transaksi</p>
-                        <p class="mt-2 text-2xl font-bold">Rp <?= $rataRata ?></p>
+                    <article class="bg-cyan-700 p-5 text-white">
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-100">Rata-rata per Transaksi</p>
+                        <p class="mt-2 text-3xl font-bold">Rp <?= $rataRata ?></p>
                     </article>
                 </div>
 
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <article class="bg-white p-6 border-t-4 border-slate-900">
                     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <h3 class="text-lg font-bold">Daftar Histori</h3>
                     </div>
 
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[860px] text-left text-sm">
-                            <thead class="text-xs uppercase tracking-[0.12em] text-slate-500">
-                                <tr>
-                                    <th class="pb-3">ID</th>
-                                    <th class="pb-3">Waktu</th>
-                                    <th class="pb-3">Total Harga</th>
-                                    <th class="pb-3">Aksi</th>
+                            <thead>
+                                <tr class="bg-slate-900 text-xs uppercase tracking-[0.12em] text-slate-300">
+                                    <th class="px-4 py-3">ID</th>
+                                    <th class="px-4 py-3">Waktu</th>
+                                    <th class="px-4 py-3">Total Harga</th>
+                                    <th class="px-4 py-3">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($history as $row): ?>
-                                    <tr class="border-t border-slate-100">
-                                        <td class="py-3 font-semibold">#TRX-<?= $row['id'] ?></td>
-                                        <td class="py-3 text-slate-600"><?= $row['tgl_pembelian'] ?></td>
-                                        <td class="py-3 text-slate-700">
+                                    <tr class="border-b-2 border-slate-100 hover:bg-slate-50">
+                                        <td class="px-4 py-3 font-bold">#TRX-<?= $row['id'] ?></td>
+                                        <td class="px-4 py-3 text-slate-600"><?= $row['tgl_pembelian'] ?></td>
+                                        <td class="px-4 py-3 font-semibold text-slate-800">
                                             Rp<?= number_format((int) $row['total_harga'], 0, ',', '.') ?></td>
-                                        <td class="py-3">
+                                        <td class="px-4 py-3">
                                             <a href="/simedic/invoice?id=<?= (int) $row['id'] ?>"
-                                                class="inline-flex items-center rounded-lg border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-xs font-semibold text-cyan-700 hover:bg-cyan-100">
+                                                class="inline-flex items-center bg-cyan-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-cyan-700">
                                                 Lihat Struk
                                             </a>
                                         </td>

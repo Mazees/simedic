@@ -79,7 +79,7 @@ if (isset($_GET['search'])) {
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="min-h-full bg-slate-50 font-sans text-slate-900">
+<body class="min-h-full bg-slate-100 font-sans text-slate-900">
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
 
@@ -87,63 +87,63 @@ if (isset($_GET['search'])) {
             <?php include __DIR__ . '/../components/header.php'; ?>
             <div class="grid gap-6 lg:grid-cols-3">
                 <section class="lg:col-span-2 space-y-6">
-                    <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <article class="bg-white p-6 border-t-4 border-cyan-500">
                         <div class="flex flex-wrap items-center justify-between gap-3">
                             <h3 class="text-lg font-bold">Data Product</h3>
-                            <form method="get" class="w-full flex gap-2 sm:w-auto">
+                            <form method="get" class="w-full flex gap-0 sm:w-auto">
                                 <input type="text" value="<?= $_GET['search'] ?? '' ?>"
                                     placeholder="Cari nama product..." name="search"
-                                    class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600 sm:w-72" />
+                                    class="w-full border-2 border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-500 sm:w-72" />
 
                                 <button type="submit"
-                                    class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
+                                    class="bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
                                     Cari
                                 </button>
                             </form>
                         </div>
 
-                        <div class="mt-4 grid gap-4 sm:grid-cols-3">
-                            <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Total Product</p>
+                        <div class="mt-4 grid gap-0 sm:grid-cols-3">
+                            <div class="bg-cyan-600 p-4 text-white">
+                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-100">Total Product</p>
                                 <p class="mt-1 text-2xl font-bold"><?= $totalProduct ?></p>
                             </div>
-                            <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Harga Rata-Rata</p>
-                                <p class="mt-1 text-2xl font-bold text-cyan-700"><?= $rataRataHarga ?></p>
+                            <div class="bg-slate-900 p-4 text-white">
+                                <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Harga Rata-Rata</p>
+                                <p class="mt-1 text-2xl font-bold text-cyan-400"><?= $rataRataHarga ?></p>
                             </div>
                         </div>
 
                         <div class="mt-5 overflow-x-auto">
                             <table class="w-full min-w-[760px] text-left text-sm">
-                                <thead class="text-xs uppercase tracking-[0.12em] text-slate-500">
-                                    <tr>
-                                        <th class="pb-3">ID</th>
-                                        <th class="pb-3">Nama Product</th>
-                                        <th class="pb-3">Harga</th>
-                                        <th class="pb-3 text-left">Aksi</th>
+                                <thead>
+                                    <tr class="bg-slate-900 text-xs uppercase tracking-[0.12em] text-slate-300">
+                                        <th class="px-4 py-3">ID</th>
+                                        <th class="px-4 py-3">Nama Product</th>
+                                        <th class="px-4 py-3">Harga</th>
+                                        <th class="px-4 py-3 text-left">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php foreach ($listProduct as $key => $product): ?>
-                                        <tr class="border-t border-slate-100">
-                                            <td class="py-3 text-slate-500">#OB<?= $product['id'] ?></td>
-                                            <td class="py-3 font-semibold"><?= $product['nama'] ?></td>
-                                            <td class="py-3 text-slate-600">
+                                        <tr class="border-b-2 border-slate-100 hover:bg-slate-50">
+                                            <td class="px-4 py-3 text-slate-500">#OB<?= $product['id'] ?></td>
+                                            <td class="px-4 py-3 font-semibold"><?= $product['nama'] ?></td>
+                                            <td class="px-4 py-3 text-slate-600">
                                                 Rp <?= $product['harga'] ?>
                                             </td>
-                                            <td class="py-3 text-left">
+                                            <td class="px-4 py-3 text-left">
                                                 <div class="inline-flex items-center gap-2">
                                                     <button type="button"
                                                         @click='setEditForm(<?= (int) $product['id'] ?>, <?= json_encode($product['nama']) ?>, <?= (int) $product['harga'] ?>)'
-                                                        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold hover:border-cyan-500">
+                                                        class="border-2 border-slate-300 bg-white px-3 py-1.5 text-xs font-bold hover:border-cyan-500 hover:bg-cyan-50">
                                                         Edit
                                                     </button>
                                                     <form method="POST"
                                                         onsubmit="return confirm('Hapus obat <?= $product['nama'] ?>?')">
                                                         <input type="hidden" name="id"
                                                             value="<?php echo $product['id']; ?>" />
-                                                        <button type="submit" name="delete" class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5
-                                                        text-xs font-semibold text-rose-700 hover:bg-rose-100">
+                                                        <button type="submit" name="delete" class="border-2 border-rose-400 bg-rose-500 px-3 py-1.5
+                                                        text-xs font-bold text-white hover:bg-rose-600">
                                                             Hapus
                                                         </button>
                                                     </form>
@@ -157,28 +157,28 @@ if (isset($_GET['search'])) {
                     </article>
                 </section>
 
-                <article x-show="!isEditMode" class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
+                <article x-show="!isEditMode" class="bg-slate-900 p-6 text-white">
                     <div class="flex items-center justify-between gap-3">
                         <h3 class="text-lg font-bold">Tambah Product</h3>
-                        <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">Mode
+                        <span class="bg-cyan-600 px-3 py-1 text-xs font-bold uppercase tracking-wider">Mode
                             Tambah</span>
                     </div>
-                    <p class="mt-1 text-sm text-slate-500">Form khusus tambah product baru.</p>
+                    <p class="mt-1 text-sm text-slate-400">Form khusus tambah product baru.</p>
 
                     <form class="mt-4 space-y-3" method="post">
                         <input x-model="addForm.name" type="text" placeholder="Nama product" name="nama"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            class="w-full border-2 border-slate-600 bg-slate-800 px-4 py-2 text-sm text-white outline-none focus:border-cyan-500 placeholder-slate-500"
                             required />
                         <input x-model.number="addForm.price" type="number" min="0" placeholder="Harga" name="harga"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            class="w-full border-2 border-slate-600 bg-slate-800 px-4 py-2 text-sm text-white outline-none focus:border-cyan-500 placeholder-slate-500"
                             required />
                         <div class="flex gap-2">
                             <button type="submit" name="add"
-                                class="w-full rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
+                                class="w-full bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
                                 Tambah Product
                             </button>
                             <button type="button"
-                                class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+                                class="border-2 border-slate-600 bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-slate-700"
                                 @click="resetAddForm()">
                                 Reset
                             </button>
@@ -186,27 +186,27 @@ if (isset($_GET['search'])) {
                     </form>
                 </article>
 
-                <article x-show="isEditMode" class="rounded-2xl border border-amber-200 bg-white p-6 shadow-sm">
+                <article x-show="isEditMode" class="bg-amber-500 p-6 text-white">
                     <div class="flex items-center justify-between gap-3">
                         <h3 class="text-lg font-bold">Edit Product</h3>
                     </div>
-                    <p class="mt-1 text-sm text-slate-500">Form khusus edit product yang dipilih.</p>
+                    <p class="mt-1 text-sm text-amber-100">Form khusus edit product yang dipilih.</p>
 
                     <form class="mt-4 space-y-3" method="post">
                         <input x-model="editForm.name" type="text" placeholder="Nama product" name="nama"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            class="w-full border-2 border-amber-400 bg-amber-600 px-4 py-2 text-sm text-white outline-none focus:border-white placeholder-amber-200"
                             required />
                         <input x-model.number="editForm.price" type="number" min="0" placeholder="Harga" name="harga"
-                            class="w-full rounded-xl border border-slate-300 px-4 py-2 text-sm outline-none focus:border-cyan-600"
+                            class="w-full border-2 border-amber-400 bg-amber-600 px-4 py-2 text-sm text-white outline-none focus:border-white placeholder-amber-200"
                             required />
                         <input type="hidden" name="product_id" x-model="editForm.id" />
                         <div class="flex gap-2">
                             <button type="submit" name="edit"
-                                class="w-full rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-amber-700">
+                                class="w-full bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800">
                                 Update Product
                             </button>
                             <button type="button"
-                                class="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700"
+                                class="border-2 border-amber-400 bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
                                 @click="cancelEdit()">
                                 Batal
                             </button>

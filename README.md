@@ -40,6 +40,7 @@ simedic/
 ├── list-product/     # Manajemen data produk (tambah, edit, hapus)
 ├── stok-obat/        # Manajemen stok dan inventaris obat
 ├── pos-obat/         # Kasir / Point of Sale
+├── invoice/          # Halaman struk / bukti transaksi
 ├── histori-transaksi/# Rekap transaksi yang telah selesai
 ├── manajemen-user/   # Manajemen akun pengguna (Super Admin only)
 └── error/            # Halaman error (400/401/403/404/500)
@@ -91,6 +92,7 @@ CREATE TABLE detail_transaksi (
     nama_product   VARCHAR(100),
     harga_product  INT,
     qty            INT,
+    subtotal       INT GENERATED ALWAYS AS (harga_product * qty) STORED,
     FOREIGN KEY (id_transaksi) REFERENCES transaksi(id) ON DELETE CASCADE,
     FOREIGN KEY (id_product)   REFERENCES product(id)   ON DELETE SET NULL
 );

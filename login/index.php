@@ -15,7 +15,7 @@ if (isset($_POST['login'])) {
 ?>
 
 <!doctype html>
-<html lang="id" x-data="loginPage()" class="h-full bg-slate-50">
+<html lang="id" x-data="loginPage()" class="h-full bg-slate-900">
 
 <head>
     <meta charset="UTF-8" />
@@ -50,66 +50,52 @@ if (isset($_POST['login'])) {
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="h-full bg-slate-50 text-slate-800">
+<body class="h-full bg-slate-900 text-white">
     <div class="min-h-full">
         <main class="mx-auto flex min-h-screen max-w-6xl items-center px-4 py-10 sm:px-6 lg:px-8">
-            <div class="grid w-full gap-6 lg:grid-cols-2">
-                <section class="rounded-2xl border border-cyan-200 bg-cyan-50 p-8">
+            <div class="grid w-full gap-0 lg:grid-cols-2">
+                <section class="bg-slate-800 border-l-4 border-cyan-500 p-8">
                     <p
-                        class="mb-4 inline-flex items-center rounded-full border border-brand-500/30 px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-700">
+                        class="mb-4 inline-flex items-center border-2 border-cyan-500 px-4 py-1 text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">
                         Sistem Manajemen Obat
                     </p>
-                    <h1 class="text-4xl font-bold leading-tight md:text-5xl">
+                    <h1 class="text-4xl font-bold leading-tight md:text-5xl text-white">
                         SIMEDIC
                     </h1>
-                    <p class="mt-4 max-w-md text-slate-600">
+                    <p class="mt-4 max-w-md text-slate-400">
                         Kendalikan operasional apotek dari dashboard utama hingga
                         transaksi penjualan POS dalam satu sistem yang sederhana.
                     </p>
-                    <div class="mt-8 grid gap-4 sm:grid-cols-2">
-                        <div class="rounded-xl border border-cyan-200 bg-white p-4">
-                            <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                Akurasi Stok
-                            </p>
-                            <p class="mt-2 text-2xl font-bold text-brand-700">99.2%</p>
-                        </div>
-                        <div class="rounded-xl border border-cyan-200 bg-white p-4">
-                            <p class="text-xs uppercase tracking-[0.2em] text-slate-500">
-                                Transaksi Hari Ini
-                            </p>
-                            <p class="mt-2 text-2xl font-bold text-brand-700">128</p>
-                        </div>
-                    </div>
                 </section>
 
-                <section class="rounded-2xl border border-cyan-200 bg-white p-8 shadow-sm">
+                <section class="bg-white p-8 text-slate-900">
                     <h2 class="text-2xl font-bold">Masuk ke SIMEDIC</h2>
                     <p class="mt-2 text-sm text-slate-500">
                         Gunakan akun staf apotek untuk mengakses modul sistem.
                     </p>
 
                     <?php if ($loginError): ?>
-                        <div class="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                        <div class="mt-4 border-l-4 border-rose-500 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                             <?php echo htmlspecialchars($loginError, ENT_QUOTES, 'UTF-8'); ?>
                         </div>
                     <?php endif; ?>
 
                     <form class="mt-8 space-y-5" method="post">
                         <div>
-                            <label for="username" class="mb-2 block text-sm text-slate-600">Username</label>
+                            <label for="username" class="mb-2 block text-sm font-semibold text-slate-700">Username</label>
                             <input id="username" name="username" type="username" x-model="form.username" required
-                                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-brand-500"
+                                class="w-full border-2 border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-cyan-500"
                                 placeholder="Masukkan username" />
                         </div>
 
                         <div>
-                            <label for="password" class="mb-2 block text-sm text-slate-600">Password</label>
+                            <label for="password" class="mb-2 block text-sm font-semibold text-slate-700">Password</label>
                             <div class="relative" x-data="{showPassword:false}">
                                 <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required
-                                    class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 pr-12 outline-none transition focus:border-brand-500"
+                                    class="w-full border-2 border-slate-300 bg-white px-4 py-3 pr-12 outline-none transition focus:border-cyan-500"
                                     placeholder="Masukkan password" />
                                 <button type="button"
-                                    class="absolute inset-y-0 right-0 px-4 text-sm text-slate-500 hover:text-slate-700"
+                                    class="absolute inset-y-0 right-0 px-4 text-sm font-semibold text-slate-500 hover:text-slate-700"
                                     @click="showPassword = !showPassword">
                                     <span x-text="showPassword ? 'Hide' : 'Show'"></span>
                                 </button>
@@ -117,7 +103,7 @@ if (isset($_POST['login'])) {
                         </div>
 
                         <button type="submit" name="login"
-                            class="w-full rounded-xl bg-brand-600 px-4 py-3 font-bold text-white transition hover:bg-brand-700">
+                            class="w-full bg-cyan-600 px-4 py-3 font-bold text-white transition hover:bg-cyan-700">
                             Masuk
                         </button>
                     </form>

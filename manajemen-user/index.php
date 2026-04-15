@@ -59,7 +59,7 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="min-h-full bg-slate-50 font-sans text-slate-900">
+<body class="min-h-full bg-slate-100 font-sans text-slate-900">
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
 
@@ -69,25 +69,25 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
             <section class="space-y-6">
 
                 <!-- Form Tambah User -->
-                <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <article class="bg-slate-900 p-6 text-white">
                     <h3 class="mb-5 text-lg font-bold">Tambah User Baru</h3>
                     <form method="POST" class="grid gap-4 sm:grid-cols-[1fr_1fr_auto]">
                         <input type="hidden" name="action" value="add" />
                         <div>
                             <label
-                                class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-slate-500">Username</label>
+                                class="mb-1.5 block text-xs font-bold uppercase tracking-widest text-slate-400">Username</label>
                             <input name="username" type="text" required placeholder="contoh: budi_apotek"
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" />
+                                class="w-full border-2 border-slate-600 bg-slate-800 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500 placeholder-slate-500" />
                         </div>
                         <div>
                             <label
-                                class="mb-1.5 block text-xs font-semibold uppercase tracking-widest text-slate-500">Password</label>
+                                class="mb-1.5 block text-xs font-bold uppercase tracking-widest text-slate-400">Password</label>
                             <input name="password" type="password" required placeholder="Min. 8 karakter"
-                                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-100" />
+                                class="w-full border-2 border-slate-600 bg-slate-800 px-4 py-2.5 text-sm text-white outline-none focus:border-cyan-500 placeholder-slate-500" />
                         </div>
                         <div class="flex items-end">
                             <button type="submit"
-                                class="w-full rounded-xl bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
+                                class="w-full bg-cyan-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-cyan-700">
                                 + Tambah
                             </button>
                         </div>
@@ -95,10 +95,10 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
                 </article>
 
                 <!-- Tabel User -->
-                <article class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-                    <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <article class="bg-white border-t-4 border-cyan-500">
+                    <div class="flex items-center justify-between border-b-2 border-slate-200 px-6 py-4">
                         <h3 class="text-lg font-bold">Daftar Pengguna</h3>
-                        <span class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">
+                        <span class="bg-cyan-600 px-3 py-1 text-xs font-bold text-white uppercase tracking-wider">
                             <?php echo count($users); ?> Akun
                         </span>
                     </div>
@@ -106,30 +106,30 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
                         <table class="w-full text-sm">
                             <thead>
                                 <tr
-                                    class="border-b border-slate-100 bg-slate-50 text-xs uppercase tracking-widest text-slate-500">
+                                    class="bg-slate-900 text-xs uppercase tracking-widest text-slate-300">
                                     <th class="px-6 py-3 text-left">#</th>
                                     <th class="px-6 py-3 text-left">Username</th>
                                     <th class="px-6 py-3 text-left">Role</th>
                                     <th class="px-6 py-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y-2 divide-slate-100">
                                 <?php foreach ($users as $i => $u): ?>
                                     <tr class="hover:bg-slate-50">
                                         <td class="px-6 py-4 text-slate-400"><?php echo $i + 1; ?></td>
                                         <td class="px-6 py-4 font-semibold">
                                             <?php echo htmlspecialchars($u['username']); ?>
                                             <?php if ($u['id'] == $_SESSION['user_id']): ?><span
-                                                    class="ml-2 rounded-full bg-cyan-100 px-2 py-0.5 text-[10px] font-bold text-cyan-700">Anda</span><?php endif; ?>
+                                                    class="ml-2 bg-cyan-600 px-2 py-0.5 text-[10px] font-bold text-white">Anda</span><?php endif; ?>
                                         </td>
                                         <td class="px-6 py-4">
                                             <?php if ($u['is_super_admin']): ?>
                                                 <span
-                                                    class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700">Super
+                                                    class="bg-amber-500 px-3 py-1 text-xs font-bold text-white">Super
                                                     Admin</span>
                                             <?php else: ?>
                                                 <span
-                                                    class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">User</span>
+                                                    class="bg-slate-200 px-3 py-1 text-xs font-bold text-slate-700">User</span>
                                             <?php endif; ?>
                                         </td>
                                         <td class="px-6 py-4">
@@ -141,12 +141,12 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
                                                         <?php if ($u['is_super_admin']): ?>
                                                             <input type="hidden" name="action" value="demote" />
                                                             <button
-                                                                class="rounded-lg border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-200">↓
+                                                                class="border-2 border-slate-300 bg-slate-200 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-300">↓
                                                                 Demote</button>
                                                         <?php else: ?>
                                                             <input type="hidden" name="action" value="promote" />
                                                             <button
-                                                                class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-bold text-amber-700 hover:bg-amber-100">↑
+                                                                class="bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600">↑
                                                                 Promote</button>
                                                         <?php endif; ?>
                                                     </form>
@@ -156,7 +156,7 @@ $pageSubtitle = 'Kelola akun pengguna dan hak akses sistem SIMEDIC.';
                                                         <input type="hidden" name="action" value="delete" />
                                                         <input type="hidden" name="id" value="<?php echo $u['id']; ?>" />
                                                         <button
-                                                            class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100">Hapus</button>
+                                                            class="bg-rose-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-rose-600">Hapus</button>
                                                     </form>
                                                 <?php endif; ?>
                                             </div>

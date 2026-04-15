@@ -42,7 +42,7 @@ $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="min-h-full bg-slate-50 font-sans text-slate-900">
+<body class="min-h-full bg-slate-100 font-sans text-slate-900">
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <?php include __DIR__ . '/../components/sidebar.php'; ?>
 
@@ -50,10 +50,11 @@ $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
             <?php include __DIR__ . '/../components/header.php'; ?>
 
             <section class="space-y-6">
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <template x-for="card in stats" :key="card.label">
-                        <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                            <p class="text-xs uppercase tracking-[0.2em] text-slate-500" x-text="card.label"></p>
+                <div class="grid gap-0 sm:grid-cols-2 xl:grid-cols-4">
+                    <template x-for="(card, idx) in stats" :key="card.label">
+                        <article class="border-l-4 bg-white p-5"
+                            :class="idx % 2 === 0 ? 'border-cyan-500' : 'border-slate-900'">
+                            <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500" x-text="card.label"></p>
                             <p class="mt-2 text-3xl font-bold" x-text="card.value"></p>
                             <p class="mt-2 text-sm"
                                 :class="card.trend.startsWith('+') ? 'text-cyan-700' : 'text-slate-600'"
@@ -63,32 +64,32 @@ $pageSubtitle = 'Ringkasan performa operasional apotek hari ini.';
                 </div>
 
                 <div class="grid gap-6 xl:grid-cols-3">
-                    <article class="xl:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <article class="xl:col-span-2 bg-white p-6 border-t-4 border-cyan-500">
                         <div class="mb-6 flex items-center justify-between">
                             <h3 class="text-lg font-bold">Ringkasan Penjualan 7 Hari</h3>
                             <span
-                                class="rounded-full bg-cyan-100 px-3 py-1 text-xs font-semibold text-cyan-700">Realtime</span>
+                                class="bg-cyan-600 px-3 py-1 text-xs font-bold text-white uppercase tracking-wider">Realtime</span>
                         </div>
                         <div class="grid grid-cols-7 gap-3">
                             <template x-for="day in sales" :key="day.name">
                                 <div class="space-y-2 text-center">
-                                    <div class="mx-auto flex h-36 w-8 items-end rounded-full bg-slate-100">
-                                        <div class="w-full rounded-full bg-cyan-600" :style="`height: ${day.amount}%;`">
+                                    <div class="mx-auto flex h-36 w-8 items-end bg-slate-200">
+                                        <div class="w-full bg-cyan-600" :style="`height: ${day.amount}%;`">
                                         </div>
                                     </div>
-                                    <p class="text-xs font-semibold text-slate-600" x-text="day.name"></p>
+                                    <p class="text-xs font-bold text-slate-700" x-text="day.name"></p>
                                 </div>
                             </template>
                         </div>
                     </article>
 
-                    <article class="rounded-2xl border border-cyan-200 bg-white p-6 shadow-sm">
+                    <article class="bg-slate-900 p-6 text-white">
                         <h3 class="text-lg font-bold">Peringatan Cepat</h3>
                         <div class="mt-4 space-y-3">
                             <template x-for="alert in alerts" :key="alert.title">
-                                <div class="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                                    <p class="font-semibold" x-text="alert.title"></p>
-                                    <p class="mt-1 text-sm text-slate-600" x-text="alert.message"></p>
+                                <div class="border-l-4 border-cyan-400 bg-slate-800 p-4">
+                                    <p class="font-semibold text-white" x-text="alert.title"></p>
+                                    <p class="mt-1 text-sm text-slate-400" x-text="alert.message"></p>
                                 </div>
                             </template>
                         </div>

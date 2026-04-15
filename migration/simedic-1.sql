@@ -34,7 +34,7 @@ create table detail_transaksi (
 	nama_product VARCHAR(100),
 	harga_product INT,
 	qty INT,
-	subtotal INT GENERATED ALWAYS AS (harga_product * qty) STORED;
+	subtotal INT GENERATED ALWAYS AS (harga_product * qty) STORED,
 	foreign key (id_transaksi) references transaksi (id) on delete cascade ,
 	foreign key (id_product) references product (id) on delete set  null
 );
