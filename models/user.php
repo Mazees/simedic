@@ -101,7 +101,7 @@ class SuperAdmin extends User
     }
 }
 
-$user;
+$user = new User();
 
 try {
     $user = new SuperAdmin();
